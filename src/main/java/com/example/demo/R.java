@@ -1,6 +1,7 @@
 package com.example.demo;
 
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.PrintSetup;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -44,9 +45,26 @@ public class R {
     static void copy(int from, int to, Sheet sheet) {
         Row fromr = sheet.getRow(from);
         Row tor = sheet.getRow(to);
+
+        //PrintSetup printSetup = sheet.getPrintSetup();
+        //printSetup.setLandscape(true);
+        //printSetup.setFitHeight((short) 100);
+
+        int k = to-sheet.getLastRowNum();
+        if(k>0) {
+            for (int i=sheet.getLastRowNum()+1;i<=to;i++) {
+                Row row = sheet.createRow(i);
+                for (int i2=0;i2<=50;i2++) {
+                    Cell cell = row.createCell(i2);
+                    System.out.println(cell);
+                }
+            }
+        }
+
+        tor.setHeight(fromr.getHeight());
         tor.setRowStyle(fromr.getRowStyle());
 
-        copyMergedRegions(from,to,sheet);
+        //copyMergedRegions(from,to,sheet);
 
         for (Cell fromc :
                 fromr) {
@@ -58,6 +76,17 @@ public class R {
             } catch (Exception e) {
 
             }
+        }
+
+    }
+
+    static void shift(int from, int to, int shiftValue, Sheet sheet) {
+        CellRangeAddressUList cellRangeAddressUList = new CellRangeAddressUList(sheet);
+        cellRangeAddressUList.shift(from, to, shiftValue);
+        cellRangeAddressUList.copyTo(sheet);
+
+        for (int i=to;i>=from;i--) {
+            copy(i,i+shiftValue,sheet);
         }
 
     }

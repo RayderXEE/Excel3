@@ -14,7 +14,7 @@ public class CellRangeAddressUList {
         }
     }
 
-    ArrayList<CellRangeAddressU> cellRangeAddressUArrayList = new ArrayList<>();
+    public ArrayList<CellRangeAddressU> cellRangeAddressUArrayList = new ArrayList<>();
 
     public CellRangeAddressUList(Sheet sheet) {
         List<CellRangeAddress> cellRangeAddressList = sheet.getMergedRegions();
@@ -45,6 +45,14 @@ public class CellRangeAddressUList {
         }
     }
 
-
+    void shift(int from, int to, int shiftValue) {
+        for (CellRangeAddressU cellRangeAddressU :
+                cellRangeAddressUArrayList) {
+            if (cellRangeAddressU.fr >= from && cellRangeAddressU.fr <= to) {
+                cellRangeAddressU.fr += shiftValue;
+                cellRangeAddressU.lr += shiftValue;
+            }
+        }
+    }
 
 }

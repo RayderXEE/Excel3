@@ -40,7 +40,8 @@ public class C {
                 //System.out.println(numericValue);
                 break;
             case Cell.CELL_TYPE_FORMULA:
-                cell.setCellValue(this.formula);
+                //cell.setCellValue(this.formula);
+                cell.setCellFormula(this.formula);
                 break;
         }
     }
