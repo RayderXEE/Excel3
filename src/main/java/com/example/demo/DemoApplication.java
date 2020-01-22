@@ -3,6 +3,7 @@ package com.example.demo;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.decimal4j.util.DoubleRounder;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -57,8 +58,18 @@ public class DemoApplication implements CommandLineRunner {
 		HashMap<Integer, Integer> links = new HashMap<>();
 		links.put(6, 36);
 		links.put(0, 16);
+		links.put(7, 39);
+		links.put(8, 42);
+		//links.put(8, 42);
 
-		rs.get(0).copyToUsingLinks(33,sheetTemplate, links);
+		for (int i=0;i<rs.size();i++) {
+			//sheetTemplate.getRow(32+i).setRowStyle(null);
+			rs.get(i).copyToUsingLinks(32+i,sheetTemplate, links);
+			Row row = sheetTemplate.getRow(32+i);
+			row.createCell(45).setCellValue("20%");
+			double priceWithoutVAT = row.getCell(42).getNumericCellValue();
+			row.createCell(48).setCellValue(DoubleRounder.round( priceWithoutVAT/100*20,2));
+		}
 
 		workbookTemplate.write(new FileOutputStream("Template Output.xlsx"));
 	}

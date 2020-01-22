@@ -55,7 +55,7 @@ public class R {
 
     }
 
-    ArrayList<C> cs = new ArrayList<>();
+    HashMap<Integer,C> cs = new HashMap<>();
 
     R copyFrom(int rowIndex, Sheet sheet) {
         Row row = sheet.getRow(rowIndex);
@@ -63,17 +63,17 @@ public class R {
         for (Cell cell :
                 row) {
             C c = new C().copyFrom(cell);
-            cs.add(c);
+            cs.put(c.columnIndex, c);
         }
 
         return this;
     }
 
     R copyTo(int rowIndex, Sheet sheet) {
-        Row row = sheet.createRow(rowIndex);
+        Row row = sheet.getRow(rowIndex);
 
         for (C c :
-                cs) {
+                cs.values()) {
             c.style = sheet.getRow(c.rowIndex).getCell(c.columnIndex).getCellStyle();
             c.copyTo(rowIndex, c.columnIndex, sheet);
         }
@@ -85,8 +85,9 @@ public class R {
         Row row = sheet.createRow(rowIndex);
 
         for (C c :
-                cs) {
-            c.style = sheet.getRow(c.rowIndex).getCell(c.columnIndex).getCellStyle();
+                cs.values()) {
+            //c.style = sheet.getRow(c.rowIndex).getCell(c.columnIndex).getCellStyle();
+            c.style = null;
             if (links.get(c.columnIndex) != null) {
                 c.style = sheet.getRow(c.rowIndex).getCell(c.columnIndex).getCellStyle();
                 c.copyTo(rowIndex, links.get(c.columnIndex), sheet);
