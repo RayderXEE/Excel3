@@ -40,6 +40,8 @@ public class CellRangeAddressUList {
     }
 
     void shift(int from, int to, int shiftValue) {
+        ArrayList<CellRangeAddressU> newCellRangeAddressUArrayList = new ArrayList<>();
+
         for (int i=0; i<cellRangeAddressUArrayList.size(); i++) {
             CellRangeAddressU cellRangeAddressU = cellRangeAddressUArrayList.get(i);
 
@@ -49,10 +51,24 @@ public class CellRangeAddressUList {
             }
 
             if (cellRangeAddressU.fr >= from && cellRangeAddressU.fr <= to) {
+                int fr = cellRangeAddressU.fr;
+                int lr = cellRangeAddressU.lr;
+                int fc = cellRangeAddressU.fc;
+                int lc = cellRangeAddressU.lc;
+                if (cellRangeAddressU.lr < from+shiftValue) {
+                    newCellRangeAddressUArrayList.add(new CellRangeAddressU().setPosition(fr,lr,fc,lc));
+                }
+
                 cellRangeAddressU.fr += shiftValue;
                 cellRangeAddressU.lr += shiftValue;
             }
         }
+
+        for (CellRangeAddressU cellRangeAddressU :
+                newCellRangeAddressUArrayList) {
+            cellRangeAddressUArrayList.add(cellRangeAddressU);
+        }
+
     }
 
 }

@@ -17,6 +17,14 @@ public class CellRangeAddressU {
         return this;
     }
 
+    CellRangeAddressU setPosition(int fr, int lr, int fc, int lc) {
+        this.fr = fr;
+        this.lr = lr;
+        this.fc = fc;
+        this.lc = lc;
+        return this;
+    }
+
     public String toString() {
         return "fr " + fr + "; lr " + lr + "; fc " + fc + "; lc " + lc;
     }

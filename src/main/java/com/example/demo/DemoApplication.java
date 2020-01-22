@@ -25,7 +25,11 @@ public class DemoApplication implements CommandLineRunner {
 		Workbook workbook = new XSSFWorkbook(new FileInputStream("Template.xlsx"));
 		Sheet sheet = workbook.getSheetAt(0);
 
-		R.shift(50,55,5, sheet);
+		R.shift(33,53,5, sheet);
+
+		for (int i=0; i<5; i++) {
+			R.shift(32+i,32+i,1, sheet);
+		}
 
 		workbook.write(new FileOutputStream("Template Output.xlsx"));
 	}
