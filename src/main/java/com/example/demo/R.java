@@ -6,41 +6,11 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellRangeAddress;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class R {
-
-    static void copyMergedRegions(int from, int to, Sheet sheet) {
-        List<CellRangeAddress> mergedRegions = sheet.getMergedRegions();
-        for (CellRangeAddress cellRangeAddress:
-                mergedRegions) {
-            int index = sheet.getMergedRegions().indexOf(cellRangeAddress);
-
-            int fr = cellRangeAddress.getFirstRow();
-            int lr = cellRangeAddress.getLastRow();
-            int fc = cellRangeAddress.getFirstColumn();
-            int lc = cellRangeAddress.getLastColumn();
-
-            if (fr == to) {
-                sheet.removeMergedRegion(index);
-            }
-        }
-
-        mergedRegions = sheet.getMergedRegions();
-        for (CellRangeAddress cellRangeAddress:
-                mergedRegions) {
-            int index = sheet.getMergedRegions().indexOf(cellRangeAddress);
-
-            int fr = cellRangeAddress.getFirstRow();
-            int lr = cellRangeAddress.getLastRow();
-            int fc = cellRangeAddress.getFirstColumn();
-            int lc = cellRangeAddress.getLastColumn();
-
-            if (fr == from) {
-                sheet.addMergedRegion(new CellRangeAddress(to,to,fc,lc));
-            }
-        }
-    }
 
     static void copy(int from, int to, Sheet sheet) {
         Row fromr = sheet.getRow(from);
@@ -83,6 +53,48 @@ public class R {
             copy(i,i+shiftValue,sheet);
         }
 
+    }
+
+    ArrayList<C> cs = new ArrayList<>();
+
+    R copyFrom(int rowIndex, Sheet sheet) {
+        Row row = sheet.getRow(rowIndex);
+
+        for (Cell cell :
+                row) {
+            C c = new C().copyFrom(cell);
+            cs.add(c);
+        }
+
+        return this;
+    }
+
+    R copyTo(int rowIndex, Sheet sheet) {
+        Row row = sheet.createRow(rowIndex);
+
+        for (C c :
+                cs) {
+            c.style = sheet.getRow(c.rowIndex).getCell(c.columnIndex).getCellStyle();
+            c.copyTo(rowIndex, c.columnIndex, sheet);
+        }
+
+        return this;
+    }
+
+    R copyToUsingLinks(int rowIndex, Sheet sheet, HashMap<Integer, Integer> links) {
+        Row row = sheet.createRow(rowIndex);
+
+        for (C c :
+                cs) {
+            c.style = sheet.getRow(c.rowIndex).getCell(c.columnIndex).getCellStyle();
+            if (links.get(c.columnIndex) != null) {
+                c.style = sheet.getRow(c.rowIndex).getCell(c.columnIndex).getCellStyle();
+                c.copyTo(rowIndex, links.get(c.columnIndex), sheet);
+            }
+
+        }
+
+        return this;
     }
 
 }

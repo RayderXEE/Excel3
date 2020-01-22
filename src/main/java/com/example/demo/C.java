@@ -44,7 +44,7 @@ public class C {
         }
     }
 
-    void copyFrom(Cell cell) {
+    C copyFrom(Cell cell) {
         this.type = cell.getCellType();
         this.style = cell.getCellStyle();
         this.address = cell.getAddress();
@@ -65,6 +65,26 @@ public class C {
                 this.formula = cell.getCellFormula();
                 break;
         }
+
+        return this;
+    }
+
+    String getValue() {
+        switch (this.type) {
+            case Cell.CELL_TYPE_STRING:
+                return this.stringValue;
+
+            case Cell.CELL_TYPE_BOOLEAN:
+                return String.valueOf(this.booleanValue);
+
+            case Cell.CELL_TYPE_NUMERIC:
+                return String.valueOf(this.numericValue);
+
+            case Cell.CELL_TYPE_FORMULA:
+                return this.formula;
+
+        }
+        return null;
     }
 
 }
