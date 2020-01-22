@@ -8,11 +8,11 @@ import java.util.Date;
 public class C {
 
     String stringValue;
-    boolean booleanValue;
-    Date dateValue;
-    double numericValue;
-    RichTextString richStringValue;
-    String formula;
+    //boolean booleanValue;
+    //Date dateValue;
+    //double numericValue;
+    //RichTextString richStringValue;
+    //String formula;
 
     int type;
     CellStyle style;
@@ -28,16 +28,20 @@ public class C {
 
         switch (this.type) {
             case Cell.CELL_TYPE_STRING:
+                //cell.setCellValue(this.stringValue);
                 cell.setCellValue(this.stringValue);
                 break;
             case Cell.CELL_TYPE_BOOLEAN:
-                cell.setCellValue(this.booleanValue);
+                //cell.setCellValue(this.booleanValue);
+                cell.setCellValue(Boolean.valueOf(this.stringValue));
                 break;
             case Cell.CELL_TYPE_NUMERIC:
-                cell.setCellValue(this.numericValue);
+                //cell.setCellValue(this.numericValue);
+                cell.setCellValue(Double.valueOf(this.stringValue));
                 break;
             case Cell.CELL_TYPE_FORMULA:
-                cell.setCellFormula(this.formula);
+                //cell.setCellFormula(this.formula);
+                cell.setCellFormula(this.stringValue);
                 break;
             case Cell.CELL_TYPE_BLANK:
                 break;
@@ -53,16 +57,20 @@ public class C {
 
         switch (cell.getCellType()) {
             case Cell.CELL_TYPE_STRING:
+                //this.stringValue = cell.getStringCellValue();
                 this.stringValue = cell.getStringCellValue();
                 break;
             case Cell.CELL_TYPE_BOOLEAN:
-                this.booleanValue = cell.getBooleanCellValue();
+                //this.booleanValue = cell.getBooleanCellValue();
+                this.stringValue = String.valueOf(cell.getBooleanCellValue());
                 break;
             case Cell.CELL_TYPE_NUMERIC:
-                this.numericValue = cell.getNumericCellValue();
+                //this.numericValue = cell.getNumericCellValue();
+                this.stringValue = String.valueOf(cell.getNumericCellValue());
                 break;
             case Cell.CELL_TYPE_FORMULA:
-                this.formula = cell.getCellFormula();
+                //this.formula = cell.getCellFormula();
+                this.stringValue = cell.getCellFormula();
                 break;
         }
 
@@ -72,19 +80,19 @@ public class C {
     String getValue() {
         switch (this.type) {
             case Cell.CELL_TYPE_STRING:
-                return this.stringValue;
+                //return this.stringValue;
 
             case Cell.CELL_TYPE_BOOLEAN:
-                return String.valueOf(this.booleanValue);
+                //return String.valueOf(this.booleanValue);
 
             case Cell.CELL_TYPE_NUMERIC:
-                return String.valueOf(this.numericValue);
+                //return String.valueOf(this.numericValue);
 
             case Cell.CELL_TYPE_FORMULA:
-                return this.formula;
+                //return this.formula;
 
         }
-        return null;
+        return this.stringValue;
     }
 
 }

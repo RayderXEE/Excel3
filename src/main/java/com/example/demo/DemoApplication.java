@@ -41,34 +41,35 @@ public class DemoApplication implements CommandLineRunner {
 			rs.add(new R().copyFrom(i,sheetOrder));
 		}
 
-		for (R r :
-				rs) {
-			String s = r.cs.get(1).getValue();
-			//System.out.println(s);
-		}
 
-		R.shift(33,53,7, sheetTemplate);
+		R.shift(33,53,rs.size()-1, sheetTemplate);
 
-
-
-		for (int i=0; i<5; i++) {
+		for (int i=0; i<rs.size()-1; i++) {
 			R.shift(32+i,32+i,1, sheetTemplate);
 		}
 
-		HashMap<Integer, Integer> links = new HashMap<>();
+		HashMap<Integer,Integer> links = new HashMap<>();
 		links.put(6, 36);
 		links.put(0, 16);
 		links.put(7, 39);
 		links.put(8, 42);
 		//links.put(8, 42);
 
+		for (R r :
+				rs) {
+			C c = r.cs.get(6);
+			c.type = Cell.CELL_TYPE_NUMERIC;
+		}
+
 		for (int i=0;i<rs.size();i++) {
-			//sheetTemplate.getRow(32+i).setRowStyle(null);
-			rs.get(i).copyToUsingLinks(32+i,sheetTemplate, links);
+			rs.get(i).copyTo(32+i,sheetTemplate, links, null);
 			Row row = sheetTemplate.getRow(32+i);
 			row.createCell(45).setCellValue("20%");
 			double priceWithoutVAT = row.getCell(42).getNumericCellValue();
-			row.createCell(48).setCellValue(DoubleRounder.round( priceWithoutVAT/100*20,2));
+			double vat = priceWithoutVAT/100*20;
+			double priceWithVAT = priceWithoutVAT+vat;
+			row.createCell(48).setCellValue(DoubleRounder.round( vat,2));
+			row.createCell(52).setCellValue(DoubleRounder.round( priceWithVAT,2));
 		}
 
 		workbookTemplate.write(new FileOutputStream("Template Output.xlsx"));

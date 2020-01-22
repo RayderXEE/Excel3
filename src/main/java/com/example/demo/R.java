@@ -1,9 +1,6 @@
 package com.example.demo;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.PrintSetup;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 
 import java.util.ArrayList;
@@ -69,33 +66,26 @@ public class R {
         return this;
     }
 
-    R copyTo(int rowIndex, Sheet sheet) {
-        Row row = sheet.getRow(rowIndex);
+    R copyTo(int rowIndex, Sheet sheet, HashMap<Integer,Integer> links, CellStyle style) {
+        Row row = sheet.createRow(rowIndex);
 
         for (C c :
                 cs.values()) {
-            c.style = sheet.getRow(c.rowIndex).getCell(c.columnIndex).getCellStyle();
-            c.copyTo(rowIndex, c.columnIndex, sheet);
+            c.style = style;
+            if (links != null) {
+                if (links.get(c.columnIndex) != null) {
+                    c.copyTo(rowIndex, links.get(c.columnIndex), sheet);
+                }
+            } else {
+                c.copyTo(rowIndex, c.columnIndex, sheet);
+            }
         }
 
         return this;
     }
 
-    R copyToUsingLinks(int rowIndex, Sheet sheet, HashMap<Integer, Integer> links) {
-        Row row = sheet.createRow(rowIndex);
-
-        for (C c :
-                cs.values()) {
-            //c.style = sheet.getRow(c.rowIndex).getCell(c.columnIndex).getCellStyle();
-            c.style = null;
-            if (links.get(c.columnIndex) != null) {
-                c.style = sheet.getRow(c.rowIndex).getCell(c.columnIndex).getCellStyle();
-                c.copyTo(rowIndex, links.get(c.columnIndex), sheet);
-            }
-
-        }
-
-        return this;
+    R copyTo(int rowIndex, Sheet sheet) {
+        return copyTo(rowIndex, sheet, null, null);
     }
 
 }
