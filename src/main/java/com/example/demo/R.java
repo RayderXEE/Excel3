@@ -64,11 +64,11 @@ public class R {
                 fromr) {
             C c = new C();
             c.copyFrom(fromc);
-            Cell toc = tor.getCell(fromc.getColumnIndex());
+            //Cell toc = tor.getCell(fromc.getColumnIndex());
             try {
-                c.copyTo(toc);
+                c.copyTo(to, fromc.getColumnIndex(), sheet);
             } catch (Exception e) {
-
+                e.printStackTrace();
             }
         }
 

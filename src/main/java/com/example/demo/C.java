@@ -1,9 +1,6 @@
 package com.example.demo;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.RichTextString;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellAddress;
 
 import java.util.Date;
@@ -23,7 +20,9 @@ public class C {
     int columnIndex;
     int rowIndex;
 
-    void copyTo(Cell cell) {
+    void copyTo(int rowIndex, int columnIndex, Sheet sheet) {
+        Cell cell = sheet.getRow(rowIndex).createCell(columnIndex);
+
         cell.setCellType(this.type);
         cell.setCellStyle(this.style);
 
@@ -39,6 +38,8 @@ public class C {
                 break;
             case Cell.CELL_TYPE_FORMULA:
                 cell.setCellFormula(this.formula);
+                break;
+            case Cell.CELL_TYPE_BLANK:
                 break;
         }
     }
