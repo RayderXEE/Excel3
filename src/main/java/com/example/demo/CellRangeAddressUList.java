@@ -18,20 +18,14 @@ public class CellRangeAddressUList {
 
     public CellRangeAddressUList(Sheet sheet) {
         List<CellRangeAddress> cellRangeAddressList = sheet.getMergedRegions();
-        //ArrayList<CellRangeAddressU> cellRangeAddressUArrayList = new ArrayList<>();
         for (CellRangeAddress cellRangeAddress :
                 cellRangeAddressList) {
             cellRangeAddressUArrayList.add(new CellRangeAddressU().copyFrom(cellRangeAddress));
         }
 
-//        for (CellRangeAddressU cellRangeAddressU :
-//                cellRangeAddressUArrayList) {
-//            System.out.println(cellRangeAddressU);
-//        }
     }
 
     void copyTo(Sheet sheet) {
-        //List<CellRangeAddress> cellRangeAddressList = sheet.getMergedRegions();
         removeAllMergedRegions(sheet);
 
         for (CellRangeAddressU cellRangeAddressU :
@@ -46,8 +40,14 @@ public class CellRangeAddressUList {
     }
 
     void shift(int from, int to, int shiftValue) {
-        for (CellRangeAddressU cellRangeAddressU :
-                cellRangeAddressUArrayList) {
+        for (int i=0; i<cellRangeAddressUArrayList.size(); i++) {
+            CellRangeAddressU cellRangeAddressU = cellRangeAddressUArrayList.get(i);
+
+            if (cellRangeAddressU.fr > to && cellRangeAddressU.fr <= to+shiftValue) {
+                cellRangeAddressUArrayList.remove(cellRangeAddressU);
+                i--;
+            }
+
             if (cellRangeAddressU.fr >= from && cellRangeAddressU.fr <= to) {
                 cellRangeAddressU.fr += shiftValue;
                 cellRangeAddressU.lr += shiftValue;

@@ -46,10 +46,6 @@ public class R {
         Row fromr = sheet.getRow(from);
         Row tor = sheet.getRow(to);
 
-        //PrintSetup printSetup = sheet.getPrintSetup();
-        //printSetup.setLandscape(true);
-        //printSetup.setFitHeight((short) 100);
-
         int k = to-sheet.getLastRowNum();
         if(k>0) {
             for (int i=sheet.getLastRowNum()+1;i<=to;i++) {
@@ -63,8 +59,6 @@ public class R {
 
         tor.setHeight(fromr.getHeight());
         tor.setRowStyle(fromr.getRowStyle());
-
-        //copyMergedRegions(from,to,sheet);
 
         for (Cell fromc :
                 fromr) {

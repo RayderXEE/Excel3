@@ -30,17 +30,14 @@ public class C {
         switch (this.type) {
             case Cell.CELL_TYPE_STRING:
                 cell.setCellValue(this.stringValue);
-                //System.out.println(stringValue);
                 break;
             case Cell.CELL_TYPE_BOOLEAN:
                 cell.setCellValue(this.booleanValue);
                 break;
             case Cell.CELL_TYPE_NUMERIC:
                 cell.setCellValue(this.numericValue);
-                //System.out.println(numericValue);
                 break;
             case Cell.CELL_TYPE_FORMULA:
-                //cell.setCellValue(this.formula);
                 cell.setCellFormula(this.formula);
                 break;
         }
@@ -56,14 +53,12 @@ public class C {
         switch (cell.getCellType()) {
             case Cell.CELL_TYPE_STRING:
                 this.stringValue = cell.getStringCellValue();
-                //System.out.println(stringValue);
                 break;
             case Cell.CELL_TYPE_BOOLEAN:
                 this.booleanValue = cell.getBooleanCellValue();
                 break;
             case Cell.CELL_TYPE_NUMERIC:
                 this.numericValue = cell.getNumericCellValue();
-                //System.out.println(numericValue);
                 break;
             case Cell.CELL_TYPE_FORMULA:
                 this.formula = cell.getCellFormula();
