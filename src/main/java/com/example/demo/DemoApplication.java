@@ -30,8 +30,10 @@ public class DemoApplication implements CommandLineRunner {
 		Workbook workbookOrder = new XSSFWorkbook(new FileInputStream("Order.xlsx"));
 		Sheet sheetOrder = workbookOrder.getSheetAt(0);
 
-		ArrayList<R> rs = new ArrayList<>();
+		Workbook workbookPo = new XSSFWorkbook(new FileInputStream("Po.xlsx"));
+		Sheet sheetPo = workbookPo.getSheet("Annex");
 
+		ArrayList<R> rs = new ArrayList<>();
 		for (int i=20;;i++) {
 			Row row = sheetOrder.getRow(i);
 			Cell cell = row.getCell(0);
@@ -41,6 +43,16 @@ public class DemoApplication implements CommandLineRunner {
 			rs.add(new R().copyFrom(i,sheetOrder));
 		}
 
+        ArrayList<R> pors = new ArrayList<>();
+        for (int i=10;;i++) {
+            Row row = sheetPo.getRow(i);
+            Cell cell = row.getCell(2);
+            System.out.println(cell);
+            if (cell.getCellType() == Cell.CELL_TYPE_BLANK) {
+                break;
+            }
+            pors.add(new R().copyFrom(i,sheetPo));
+        }
 
 		R.shift(33,53,rs.size()-1, sheetTemplate);
 
