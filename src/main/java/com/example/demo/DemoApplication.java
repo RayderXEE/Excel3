@@ -44,14 +44,18 @@ public class DemoApplication implements CommandLineRunner {
 		}
 
         ArrayList<R> pors = new ArrayList<>();
+        HashMap<String,String> pohm = new HashMap<>();
         for (int i=10;;i++) {
             Row row = sheetPo.getRow(i);
             Cell cell = row.getCell(2);
-            System.out.println(cell);
+            //System.out.println(cell);
             if (cell.getCellType() == Cell.CELL_TYPE_BLANK) {
                 break;
             }
-            pors.add(new R().copyFrom(i,sheetPo));
+            R r = new R().copyFrom(i,sheetPo);
+			//System.out.println(r.cs.get(2).stringValue + " " + r.cs.get(4).stringValue);
+			pohm.put(r.cs.get(2).stringValue, r.cs.get(4).stringValue);
+			pors.add(r);
         }
 
 		R.shift(33,53,rs.size()-1, sheetTemplate);
@@ -76,6 +80,9 @@ public class DemoApplication implements CommandLineRunner {
 		for (int i=0;i<rs.size();i++) {
 			rs.get(i).copyTo(32+i,sheetTemplate, links, null);
 			Row row = sheetTemplate.getRow(32+i);
+			String name = pohm.get(rs.get(i).cs.get(0).stringValue);
+            //System.out.println(name);
+            row.createCell(3).setCellValue(name);
 			row.createCell(45).setCellValue("20%");
 			double priceWithoutVAT = row.getCell(42).getNumericCellValue();
 			double vat = priceWithoutVAT/100*20;
