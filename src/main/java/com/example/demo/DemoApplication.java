@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -10,6 +11,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -58,6 +61,11 @@ public class DemoApplication implements CommandLineRunner {
 			pors.add(r);
         }
 
+        String purchaseOrderNo = sheetOrder.getRow(6).getCell(1).getStringCellValue();
+        String expectedArrivalDate = sheetOrder.getRow(8).getCell(7).getStringCellValue();
+
+		//System.out.println(expectedArrivalDate);
+
 		R.shift(33,53,rs.size()-1, sheetTemplate);
 
 		for (int i=0; i<rs.size()-1; i++) {
@@ -77,18 +85,29 @@ public class DemoApplication implements CommandLineRunner {
 			c.type = Cell.CELL_TYPE_NUMERIC;
 		}
 
+        CellStyle style = workbookTemplate.createCellStyle();
+		style.setWrapText(false);
+
 		for (int i=0;i<rs.size();i++) {
 			rs.get(i).copyTo(32+i,sheetTemplate, links, null);
 			Row row = sheetTemplate.getRow(32+i);
+            row.setHeight((short)-1);
+			row.setRowStyle(style);
 			String name = pohm.get(rs.get(i).cs.get(0).stringValue);
             //System.out.println(name);
             row.createCell(3).setCellValue(name);
+            row.getCell(3).setCellStyle(style);
 			row.createCell(45).setCellValue("20%");
 			double priceWithoutVAT = row.getCell(42).getNumericCellValue();
 			double vat = priceWithoutVAT/100*20;
 			double priceWithVAT = priceWithoutVAT+vat;
 			row.createCell(48).setCellValue(DoubleRounder.round( vat,2));
 			row.createCell(52).setCellValue(DoubleRounder.round( priceWithVAT,2));
+            sheetTemplate.getRow(21).createCell(7).setCellValue("Поставка товаров согласно контракту на поставку " +
+                    "оборудования № "+purchaseOrderNo+" от "+expectedArrivalDate);
+            sheetTemplate.getRow(21).setHeight((short)-1);
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            sheetTemplate.getRow(26).createCell(28).setCellValue(dateFormat.format(new Date()));
 		}
 
 		workbookTemplate.write(new FileOutputStream("Template Output.xlsx"));
