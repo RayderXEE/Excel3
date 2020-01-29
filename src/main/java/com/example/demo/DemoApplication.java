@@ -86,15 +86,16 @@ public class DemoApplication implements CommandLineRunner {
 		}
 
         CellStyle style = workbookTemplate.createCellStyle();
-		style.setWrapText(false);
+		style.setWrapText(true);
 
 		for (int i=0;i<rs.size();i++) {
 			rs.get(i).copyTo(32+i,sheetTemplate, links, null);
 			Row row = sheetTemplate.getRow(32+i);
-            row.setHeight((short)-1);
+            row.setHeight((short)750);
 			row.setRowStyle(style);
 			String name = pohm.get(rs.get(i).cs.get(0).stringValue);
             //System.out.println(name);
+            row.createCell(0).setCellValue(i+1);
             row.createCell(3).setCellValue(name);
             row.getCell(3).setCellStyle(style);
 			row.createCell(45).setCellValue("20%");
@@ -116,6 +117,12 @@ public class DemoApplication implements CommandLineRunner {
         rowTotal.createCell(42).setCellFormula("SUM(AQ33:AQ"+(32+rs.size())+")");
         rowTotal.createCell(48).setCellFormula("SUM(AW33:AW"+(32+rs.size())+")");
         rowTotal.createCell(52).setCellFormula("SUM(BA33:BA"+(32+rs.size())+")");
+
+        String printArea = workbookTemplate.getPrintArea(0);
+        //System.out.println(printArea);
+        workbookTemplate.setPrintArea(0,0,55,0,52+rs.size());
+        //String[] printAreaSplit = printArea.split("$");
+        //System.out.println(printAreaSplit[3]);
 
 		workbookTemplate.write(new FileOutputStream("Template Output.xlsx"));
 	}
