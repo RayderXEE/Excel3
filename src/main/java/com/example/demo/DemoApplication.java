@@ -110,6 +110,13 @@ public class DemoApplication implements CommandLineRunner {
             sheetTemplate.getRow(26).createCell(28).setCellValue(dateFormat.format(new Date()));
 		}
 
+        //  Formulas
+        Row rowTotal = sheetTemplate.getRow(32+rs.size());
+		rowTotal.createCell(36).setCellFormula("SUM(AK33:AK"+(32+rs.size())+")");
+        rowTotal.createCell(42).setCellFormula("SUM(AQ33:AQ"+(32+rs.size())+")");
+        rowTotal.createCell(48).setCellFormula("SUM(AW33:AW"+(32+rs.size())+")");
+        rowTotal.createCell(52).setCellFormula("SUM(BA33:BA"+(32+rs.size())+")");
+
 		workbookTemplate.write(new FileOutputStream("Template Output.xlsx"));
 	}
 
