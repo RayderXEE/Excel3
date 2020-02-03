@@ -8,15 +8,17 @@ import org.decimal4j.util.DoubleRounder;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.w3c.dom.*;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.net.URL;
 import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @SpringBootApplication
 public class DemoApplication implements CommandLineRunner {
@@ -34,7 +36,10 @@ public class DemoApplication implements CommandLineRunner {
 		Sheet sheetOrder = workbookOrder.getSheetAt(0);
 
 		Workbook workbookPo = new XSSFWorkbook(new FileInputStream("Po.xlsx"));
-		Sheet sheetPo = workbookPo.getSheet("Annex");
+        Sheet sheetPo = workbookPo.getSheet("Annex");
+
+        Workbook workbookInterface = new XSSFWorkbook(new FileInputStream("Interface.xlsx"));
+        Sheet sheetInterface = workbookInterface.getSheet("Sheet1");
 
 		ArrayList<R> rs = new ArrayList<>();
 		for (int i=20;;i++) {
@@ -88,6 +93,31 @@ public class DemoApplication implements CommandLineRunner {
         CellStyle style = workbookTemplate.createCellStyle();
 		style.setWrapText(true);
 
+        System.setProperty("http.maxRedirects", "200");
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        Document doc = db.parse(new URL("http://www.cbr.ru/scripts/XML_daily.asp").openStream());
+
+        double dollarValue = 0;
+        NodeList valutes = doc.getElementsByTagName("Valute");
+        //System.out.println(valutes.getLength());
+        for (int i=0;i<valutes.getLength();i++) {
+            Node valute = valutes.item(i);
+            NamedNodeMap valuteAttributes = valute.getAttributes();
+            String valuteID = valuteAttributes.item(0).getTextContent();
+            if (valuteID.equals("R01235")) {
+                String sDollarValue = valute.getLastChild().getTextContent();
+
+                NumberFormat format = NumberFormat.getInstance(Locale.FRANCE);
+                Number number = format.parse(sDollarValue);
+                dollarValue = number.doubleValue();
+            }
+        }
+
+        System.out.println(dollarValue);
+
+        double totalSum = 0;
+
 		for (int i=0;i<rs.size();i++) {
 			rs.get(i).copyTo(32+i,sheetTemplate, links, null);
 			Row row = sheetTemplate.getRow(32+i);
@@ -100,20 +130,38 @@ public class DemoApplication implements CommandLineRunner {
             row.getCell(3).setCellStyle(style);
             row.createCell(19).setCellValue("шт");
             row.createCell(22).setCellValue(796);
+
+            double count = Double.valueOf(rs.get(i).cs.get(6).stringValue);
+
+            double priceDollar = Double.valueOf(rs.get(i).cs.get(7).stringValue);
+            double priceRub = priceDollar * dollarValue;
+            priceRub = DoubleRounder.round(priceRub,2);
+            //System.out.println(priceDollar);
+            //System.out.println(priceRub);
+            row.createCell(39).setCellValue(priceRub);
+
+            double sum = priceRub * count;
+            row.createCell(42).setCellValue(sum);
+
 			row.createCell(45).setCellValue("20%");
 			double priceWithoutVAT = row.getCell(42).getNumericCellValue();
 			double vat = priceWithoutVAT/100*20;
 			double priceWithVAT = priceWithoutVAT+vat;
+			totalSum += priceWithVAT;
 			row.createCell(48).setCellValue(DoubleRounder.round( vat,2));
 			row.createCell(52).setCellValue(DoubleRounder.round( priceWithVAT,2));
-            sheetTemplate.getRow(21).createCell(7).setCellValue("Поставка товаров согласно контракту на поставку " +
-                    "оборудования № "+purchaseOrderNo+" от "+expectedArrivalDate);
-            sheetTemplate.getRow(21).setHeight((short)-1);
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            String currentDate = dateFormat.format(new Date());
-            sheetTemplate.getRow(26).createCell(28).setCellValue(currentDate);
-            sheetTemplate.getRow(59).createCell(7).setCellValue(currentDate);
 		}
+
+        sheetTemplate.getRow(21).createCell(7).setCellValue("Поставка товаров согласно контракту на поставку " +
+                "оборудования № "+purchaseOrderNo+" от "+expectedArrivalDate);
+        sheetTemplate.getRow(21).setHeight((short)-1);
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String currentDate = dateFormat.format(new Date());
+        sheetTemplate.getRow(26).createCell(28).setCellValue(currentDate);
+        sheetTemplate.getRow(59).createCell(7).setCellValue(currentDate);
+
+        double nDoc = sheetInterface.getRow(6).getCell(6).getNumericCellValue();
+        sheetTemplate.getRow(26).createCell(22).setCellValue(nDoc);
 
         //  Formulas
         Row rowTotal = sheetTemplate.getRow(32+rs.size());
@@ -121,6 +169,18 @@ public class DemoApplication implements CommandLineRunner {
         rowTotal.createCell(42).setCellFormula("SUM(AQ33:AQ"+(32+rs.size())+")");
         rowTotal.createCell(48).setCellFormula("SUM(AW33:AW"+(32+rs.size())+")");
         rowTotal.createCell(52).setCellFormula("SUM(BA33:BA"+(32+rs.size())+")");
+
+        Row rowTotalSum = sheetTemplate.getRow(44+rs.size());
+        Cell cellTotalSum = rowTotalSum.createCell(0);
+        cellTotalSum.setCellValue(totalSum);
+        CellStyle cellStyleTotalSum = workbookTemplate.createCellStyle();
+        Font font = workbookTemplate.createFont();
+        font.setItalic(true);
+        cellStyleTotalSum.setAlignment(CellStyle.ALIGN_CENTER);
+        cellStyleTotalSum.setFont(font);
+        cellTotalSum.setCellStyle(cellStyleTotalSum);
+
+        sheetTemplate.getRow(43+rs.size()).setHeight((short)-1);
 
         String printArea = workbookTemplate.getPrintArea(0);
         //System.out.println(printArea);
