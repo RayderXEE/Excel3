@@ -98,6 +98,8 @@ public class DemoApplication implements CommandLineRunner {
             row.createCell(0).setCellValue(i+1);
             row.createCell(3).setCellValue(name);
             row.getCell(3).setCellStyle(style);
+            row.createCell(19).setCellValue("шт");
+            row.createCell(22).setCellValue(796);
 			row.createCell(45).setCellValue("20%");
 			double priceWithoutVAT = row.getCell(42).getNumericCellValue();
 			double vat = priceWithoutVAT/100*20;
@@ -108,7 +110,9 @@ public class DemoApplication implements CommandLineRunner {
                     "оборудования № "+purchaseOrderNo+" от "+expectedArrivalDate);
             sheetTemplate.getRow(21).setHeight((short)-1);
             DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            sheetTemplate.getRow(26).createCell(28).setCellValue(dateFormat.format(new Date()));
+            String currentDate = dateFormat.format(new Date());
+            sheetTemplate.getRow(26).createCell(28).setCellValue(currentDate);
+            sheetTemplate.getRow(59).createCell(7).setCellValue(currentDate);
 		}
 
         //  Formulas
