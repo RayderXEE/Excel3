@@ -93,10 +93,16 @@ public class DemoApplication implements CommandLineRunner {
         CellStyle style = workbookTemplate.createCellStyle();
 		style.setWrapText(true);
 
+        // Get Date for Valute
+        Date dateValute = sheetInterface.getRow(16).getCell(6).getDateCellValue();
+        DateFormat dateFormatValute = new SimpleDateFormat("dd/MM/yyyy");
+        String dateValuteS = dateFormatValute.format(dateValute);
+        //System.out.println(dateValuteS);
+
         System.setProperty("http.maxRedirects", "200");
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
-        Document doc = db.parse(new URL("http://www.cbr.ru/scripts/XML_daily.asp").openStream());
+        Document doc = db.parse(new URL("http://www.cbr.ru/scripts/XML_daily.asp?date_req="+dateValuteS).openStream());
 
         double dollarValue = 0;
         NodeList valutes = doc.getElementsByTagName("Valute");
