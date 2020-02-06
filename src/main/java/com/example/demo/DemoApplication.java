@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import com.ibm.icu.text.RuleBasedNumberFormat;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -99,7 +100,7 @@ public class DemoApplication implements CommandLineRunner {
         String dateValuteS = dateFormatValute.format(dateValute);
         //System.out.println(dateValuteS);
 
-        System.setProperty("http.maxRedirects", "200");
+        System.setProperty("http.maxRedirects", "500");
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document doc = db.parse(new URL("http://www.cbr.ru/scripts/XML_daily.asp?date_req="+dateValuteS).openStream());
@@ -177,13 +178,22 @@ public class DemoApplication implements CommandLineRunner {
         rowTotal.createCell(52).setCellFormula("SUM(BA33:BA"+(32+rs.size())+")");
 
         Row rowTotalSum = sheetTemplate.getRow(44+rs.size());
+        rowTotalSum.setHeight((short) 600);
         Cell cellTotalSum = rowTotalSum.createCell(0);
-        cellTotalSum.setCellValue(totalSum);
+
+        RuleBasedNumberFormat nf = new RuleBasedNumberFormat(Locale.forLanguageTag("ru"),
+                RuleBasedNumberFormat.SPELLOUT);
+        //System.out.println(nf.format(1234567));
+        //String totalSunCuirsive = nf.format(totalSum);
+        String totalSumCuirsive = new Spellout().format(totalSum);
+
+        cellTotalSum.setCellValue(totalSumCuirsive);
         CellStyle cellStyleTotalSum = workbookTemplate.createCellStyle();
         Font font = workbookTemplate.createFont();
         font.setItalic(true);
         cellStyleTotalSum.setAlignment(CellStyle.ALIGN_CENTER);
         cellStyleTotalSum.setFont(font);
+        cellStyleTotalSum.setWrapText(true);
         cellTotalSum.setCellStyle(cellStyleTotalSum);
 
         sheetTemplate.getRow(43+rs.size()).setHeight((short)-1);

@@ -52,6 +52,12 @@
 			<artifactId>decimal4j</artifactId>
 			<version>1.0.3</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.ibm.icu</groupId>
+			<artifactId>icu4j</artifactId>
+			<version>65.1</version>
+		</dependency>
 	</dependencies>
 
 	<build>
