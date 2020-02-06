@@ -123,7 +123,16 @@ public class DemoApplication implements CommandLineRunner {
 
         System.out.println(dollarValue);
 
+        double totalCount = 0;
+        double totalSumWithoutVAT = 0;
+        double totalVAT = 0;
         double totalSum = 0;
+
+        CellStyle orderStyle = workbookTemplate.createCellStyle();
+        orderStyle.setBorderLeft(CellStyle.BORDER_THIN);
+        orderStyle.setBorderTop(CellStyle.BORDER_THIN);
+        orderStyle.setBorderRight(CellStyle.BORDER_THIN);
+        orderStyle.setBorderBottom(CellStyle.BORDER_THIN);
 
 		for (int i=0;i<rs.size();i++) {
 			rs.get(i).copyTo(32+i,sheetTemplate, links, null);
@@ -132,7 +141,11 @@ public class DemoApplication implements CommandLineRunner {
 			row.setRowStyle(style);
 			String name = pohm.get(rs.get(i).cs.get(0).stringValue);
             //System.out.println(name);
-            row.createCell(0).setCellValue(i+1);
+
+            Cell numberCell = row.createCell(0);
+            numberCell.setCellValue(i+1);
+            //numberCell.setCellStyle(orderStyle);
+
             row.createCell(3).setCellValue(name);
             row.getCell(3).setCellStyle(style);
             row.createCell(19).setCellValue("шт");
@@ -154,10 +167,30 @@ public class DemoApplication implements CommandLineRunner {
 			double priceWithoutVAT = row.getCell(42).getNumericCellValue();
 			double vat = priceWithoutVAT/100*20;
 			double priceWithVAT = priceWithoutVAT+vat;
+
+			totalCount += count;
+			totalSumWithoutVAT += priceWithoutVAT;
+			totalVAT += vat;
 			totalSum += priceWithVAT;
+
 			row.createCell(48).setCellValue(DoubleRounder.round( vat,2));
 			row.createCell(52).setCellValue(DoubleRounder.round( priceWithVAT,2));
-		}
+
+			//row.setRowStyle(orderStyle);
+//            for (Cell cell :
+//                    row) {
+//                cell.setCellStyle(orderStyle);
+//            }
+
+            for (int c=0;c<56;c++) {
+                Cell cell = row.getCell(c);
+                if (cell == null) {
+                    cell = row.createCell(c);
+                }
+                cell.setCellStyle(orderStyle);
+            }
+
+        }
 
         sheetTemplate.getRow(21).createCell(7).setCellValue("Поставка товаров согласно контракту на поставку " +
                 "оборудования № "+purchaseOrderNo+" от "+expectedArrivalDate);
@@ -172,10 +205,28 @@ public class DemoApplication implements CommandLineRunner {
 
         //  Formulas
         Row rowTotal = sheetTemplate.getRow(32+rs.size());
-		rowTotal.createCell(36).setCellFormula("SUM(AK33:AK"+(32+rs.size())+")");
-        rowTotal.createCell(42).setCellFormula("SUM(AQ33:AQ"+(32+rs.size())+")");
-        rowTotal.createCell(48).setCellFormula("SUM(AW33:AW"+(32+rs.size())+")");
-        rowTotal.createCell(52).setCellFormula("SUM(BA33:BA"+(32+rs.size())+")");
+//		rowTotal.createCell(36).setCellFormula("SUM(AK33:AK"+(32+rs.size())+")");
+//        rowTotal.createCell(42).setCellFormula("SUM(AQ33:AQ"+(32+rs.size())+")");
+//        rowTotal.createCell(48).setCellFormula("SUM(AW33:AW"+(32+rs.size())+")");
+//        rowTotal.createCell(52).setCellFormula("SUM(BA33:BA"+(32+rs.size())+")");
+
+        totalCount = DoubleRounder.round(totalCount, 2);
+        totalSumWithoutVAT = DoubleRounder.round(totalSumWithoutVAT, 2);
+        totalVAT = DoubleRounder.round(totalVAT, 2);
+        totalSum = DoubleRounder.round(totalSum, 2);
+
+        rowTotal.createCell(36).setCellValue(totalCount);
+        rowTotal.createCell(42).setCellValue(totalSumWithoutVAT);
+        rowTotal.createCell(48).setCellValue(totalVAT);
+        rowTotal.createCell(52).setCellValue(totalSum);
+
+        for (int c=31;c<56;c++) {
+            Cell cell = rowTotal.getCell(c);
+            if (cell == null) {
+                cell = rowTotal.createCell(c);
+            }
+            cell.setCellStyle(orderStyle);
+        }
 
         Row rowTotalSum = sheetTemplate.getRow(44+rs.size());
         rowTotalSum.setHeight((short) 600);
