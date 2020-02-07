@@ -94,32 +94,8 @@ public class DemoApplication implements CommandLineRunner {
         CellStyle style = workbookTemplate.createCellStyle();
 		style.setWrapText(true);
 
-        // Get Date for Valute
-        Date dateValute = sheetInterface.getRow(16).getCell(6).getDateCellValue();
-        DateFormat dateFormatValute = new SimpleDateFormat("dd/MM/yyyy");
-        String dateValuteS = dateFormatValute.format(dateValute);
-        //System.out.println(dateValuteS);
-
-        System.setProperty("http.maxRedirects", "500");
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        Document doc = db.parse(new URL("http://www.cbr.ru/scripts/XML_daily.asp?date_req="+dateValuteS).openStream());
-
-        double dollarValue = 0;
-        NodeList valutes = doc.getElementsByTagName("Valute");
-        //System.out.println(valutes.getLength());
-        for (int i=0;i<valutes.getLength();i++) {
-            Node valute = valutes.item(i);
-            NamedNodeMap valuteAttributes = valute.getAttributes();
-            String valuteID = valuteAttributes.item(0).getTextContent();
-            if (valuteID.equals("R01235")) {
-                String sDollarValue = valute.getLastChild().getTextContent();
-
-                NumberFormat format = NumberFormat.getInstance(Locale.FRANCE);
-                Number number = format.parse(sDollarValue);
-                dollarValue = number.doubleValue();
-            }
-        }
+		DollarRate dollarRate = new DollarRate(sheetInterface);
+        double dollarValue = dollarRate.getDollarRate();
 
         System.out.println(dollarValue);
 
@@ -133,6 +109,7 @@ public class DemoApplication implements CommandLineRunner {
         orderStyle.setBorderTop(CellStyle.BORDER_THIN);
         orderStyle.setBorderRight(CellStyle.BORDER_THIN);
         orderStyle.setBorderBottom(CellStyle.BORDER_THIN);
+        orderStyle.setWrapText(true);
 
 		for (int i=0;i<rs.size();i++) {
 			rs.get(i).copyTo(32+i,sheetTemplate, links, null);
